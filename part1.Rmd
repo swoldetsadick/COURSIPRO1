@@ -1,0 +1,38 @@
+---
+title: "Statistical Inference - Course Project"
+author: "Woldetsadick Selam Getachew"
+date: "Wednesday, October 22, 2014"
+output: html_document
+---
+```{r, echo = FALSE, cache = TRUE}
+one <- paste(paste("rexp(n, ","lambda",sep=""), ")", sep = "")
+two <- expression(lambda)
+```
+
+<hr width="100%" style="border: 2px double #000000" color="#FFFFFF" size="6"></hr>
+<center><h1> Part I: Simulation Exercises</h1></center>
+<hr  width="100%" color="#000000" size="4">
+<h3>Generating the Data</h3>
+The exponential distribution can be simulated in R with repx(n,&lambda;) where &lambda; represents the rate parameter of the exponential distribution. It can also be demonstrated that the mean of exponential distribution is &mu; = <sup>1</sup>&frasl;<sub>&lambda;</sub> and the standard deviation &theta; is also &theta; = <sup>1</sup>&frasl;<sub>&lambda;</sub>. In this simulation, &lambda; is set to equal 0.2, and n to 40. Hence are generated 1000 simulated averages of 40 exponential of parameter equal to .2.
+
+```{r, echo = TRUE, cache = TRUE}
+# 1000 simulations of 40 exponentials of parameter .2
+set.seed(123)
+n <- 40
+lambda <- .2
+nosim <- 1000
+data <- matrix(rexp(nosim * n, rate = lambda), nosim, n)
+Dim <- dim(data)
+```
+
+In the end, a data matrix of dimension ```r Dim``` is generated where each row i represents the i<sup>th</sup> simulation out of the thousand simulated 40 exponential.
+
+<h3>1. Central Tendency</h3>
+```{r, echo = TRUE, cache = TRUE}
+#Calculating averages by row, or for the 1000 different simulations over the 40 sample drawn
+xbar <- round(mean(apply(data, 1, mean)), digits = 2)
+#Calculating theoretical mean
+mu <- 1/lambda
+```
+Let's note E(X&#772;<sub>n</sub>) the expected value of the averages of the n simulated exponential of parameter &lambda;, and &mu; its true (theoretical) mean. Their values for n = 40 are respectively E(X&#772;<sub>40</sub>) = ```r xbar``` and &mu; = ```r mu```. Observe the near equality of these two values. This near equality is guaranteed by the LAW of LARGE NUMBERS (LLN).<br>
+The plot below shows a histogram of the 1000 averages of 40 samples drawn from the exponential distribution with parameter &lambda; = .2. Its corresponding density is shown in red and an-noted "Simulated". A vertical line with equation x = ```r xbar``` in red dashed is introduced to show the center of mass of the simulated exponential.<br> Moreover, for the sake of comparison a normal density of parameters &mu;<sub>N</sub> = &mu; and &theta;<sub>N</sub> = <sup>&theta;</sup>&frasl;<sub>n;</sub> = (<sup>1</sup>&frasl;<sub>&lambda;</sub>)&frasl;<sub>n</sub> is shown in blue, with a dashed line of the same color of equation x = ```r mu``` marking not only the center mass of such density, but also the theoretical mean of simulated distribution.

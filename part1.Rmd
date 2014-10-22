@@ -35,4 +35,39 @@ xbar <- round(mean(apply(data, 1, mean)), digits = 2)
 mu <- 1/lambda
 ```
 Let's note E(X&#772;<sub>n</sub>) the expected value of the averages of the n simulated exponential of parameter &lambda;, and &mu; its true (theoretical) mean. Their values for n = 40 are respectively E(X&#772;<sub>40</sub>) = ```r xbar``` and &mu; = ```r mu```. Observe the near equality of these two values. This near equality is guaranteed by the LAW of LARGE NUMBERS (LLN).<br>
-The plot below shows a histogram of the 1000 averages of 40 samples drawn from the exponential distribution with parameter &lambda; = .2. Its corresponding density is shown in red and an-noted "Simulated". A vertical line with equation x = ```r xbar``` in red dashed is introduced to show the center of mass of the simulated exponential.<br> Moreover, for the sake of comparison a normal density of parameters &mu;<sub>N</sub> = &mu; and &theta;<sub>N</sub> = <sup>&theta;</sup>&frasl;<sub>n;</sub> = (<sup>1</sup>&frasl;<sub>&lambda;</sub>)&frasl;<sub>n</sub> is shown in blue, with a dashed line of the same color of equation x = ```r mu``` marking not only the center mass of such density, but also the theoretical mean of simulated distribution.
+The plot below shows a histogram of the 1000 averages of 40 samples drawn from the exponential distribution with parameter &lambda; = .2. Its corresponding density is shown in red and an-noted "Simulated". A vertical line with equation x = ```r xbar``` in red dashed is introduced to show the center of mass of the simulated exponential.<br> Moreover, for the sake of comparison a normal density of parameters &mu;<sub>N</sub> = &mu; and &theta;<sub>N</sub> = <sup>&theta;</sup>&frasl;<sub>n;</sub> = (<sup>1</sup>&frasl;<sub>&lambda;</sub>)&frasl;<sub>&radic;n</sub> is shown in blue, while a dashed line of the same color and of equation x = ```r mu``` marks not only the center mass of such density, but also the theoretical mean of simulated distribution.
+```{r, echo = FALSE, fig.align='center'}
+library(ggplot2)
+Rmeans <- apply(data, 1, mean)
+title <- 'Distribution of Sample Means (Theoretical vs Simulated)'
+subtitle <- 'Samples drawn from exponential distribution with parameter .2'
+m <- ggplot(data.frame(Rmeans), aes(Rmeans)) 
+m <- m + geom_histogram(aes(y =..density..), binwidth = (round(max(Rmeans)-min(Rmeans))/40), color = "black", fill = "white")
+m <- m + xlab("Sample Averages") + ylab("Density") + ggtitle(bquote(atop(.(title), atop(italic(.(subtitle)), "")))) 
+m <- m + geom_density(col="red", alpha=.2, fill="#FF6666") + theme(plot.title = element_text(size=19,lineheight=.8,vjust=-1))
+m <- m + stat_function(fun = dnorm, args = list(mean = 1/lambda, sd = (1/lambda/sqrt(n))), color = "blue")
+m <- m + geom_vline(aes(xintercept = mean(Rmeans)), color = "red", linetype = "dashed", size = 1)
+m <- m + geom_vline(aes(xintercept = (1/lambda)), color = "blue", linetype = "dashed", size = 1)
+m <- m + annotate("text", label = "Simulated", x = 3.75, y = .3, size = 4, colour = "red")
+m <- m + annotate("text", label = "Theoretical", x = 7, y = .1, size = 4, colour = "blue")
+m <- m + annotate('text', label =  paste(paste(paste("E(","bar(X)", sep=""),"):", sep=""),xbar,sep=" "),parse=T, x = 5.75, y = .6, size = 4, colour = "red")
+m <- m + annotate('text', label =  paste(paste(paste("mu", ": 1/", sep=""), "lambda", sep=""), " : 5", sep =""),parse=T, x = 4.25, y = .65, size = 4, colour = "blue")
+m
+```
+<br>Observe how closely the distribution of sample averages of the simulated data follows the normal distribution centred at the theoretical mean of the sample averages. This closeness is again guaranteed by the Central Limit Theorem CLT. 
+
+<h3>2. Dispersion</h3>
+```{r, echo = TRUE, cache = TRUE}
+#Calculating sd of the 1000 averages
+Ssqr <- round((sd(apply(data, 1, mean))), digits = 2)
+#Calculating theoretical standard deviation
+theta <- round(((1/lambda)/sqrt(n)), digits = 2)
+```
+Let's note *S* the standard error of the averages of the n simulated exponential of parameter &lambda;, and &theta; its true (theoretical) standard deviation. Their values for n = 40 are respectively *S* = ```r Ssqr``` and &theta; = ```r theta```. Observe the near equality of these two values. This near equality is guaranteed by the CLT.<br>
+The theoretical & the empiric variability of the averages of the n simulated exponential around the mean is close. One can then conclude that that the expected value of sample averages is an unbiased estimator of the mean of the exponential ditribution from which the sample are drawn from.
+
+<h3> Central Limit Theorem </h3>
+```{r, echo = FALSE}
+qqnorm(Rmeans, col="red")
+qqline(row_means, col = "blue")
+```

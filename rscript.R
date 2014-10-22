@@ -9,12 +9,13 @@ nosim <- 1000
 
 data <- matrix(rexp(nosim * n, rate = lambda), nosim, n)
 
-Rmeans <- apply(data, 1, mean)
 
-xbar <- round(mean(Rmeans), digits = 2)
-true <- 1/lambda
+
+xbar <- round(mean(apply(data, 1, mean)), digits = 2)
+mu <- 1/lambda
 
 library(ggplot2)
+Rmeans <- apply(data, 1, mean)
 title <- 'Distribution of Sample Means (Theoretical vs Simulated)'
 subtitle <- 'Samples drawn from exponential distribution with parameter .2'
 m <- ggplot(data.frame(Rmeans), aes(Rmeans)) 

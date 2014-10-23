@@ -41,6 +41,51 @@ First some basic observations of the dataset. After loading **ToothGrowth** data
 Observe that the number of missing values in the dataset is exactly equal to ```r nas``` and that dimensions of said dataset are ```r Dim```. It is to be remembered that three dose levels of Vitamin are coded by level in mg in the dataset. For this analysis however the preference is to make the ```dose```variable more descriptive by substituting levels .5, 1 and 2 by LOW, MID and HIGH respectively, corresponding to more descriptive levels of dose.<br>
 This process might change the dose variable a factor variable. However to make sure that it is indeed the case, class numeric was assigned to ```len``` variable while ```supp``` and the new ```dose``` variables are assigned class factor, meaning that the latter two variables are categorical variables.<br>
 ```{r, echo = TRUE, cache = TRUE}
-#Short Summary of Data 
-summary(data)
+#Short Summary of Data
+library(psych)
+a <- summary(data$supp); b <- summary(data$dose); c <- describe(data$len)
+```
+Observe that ```supp``` variable takes values ```r names(a)``` respectively for Orange Juice and Ascorbic Acid and exactly ```r a``` times for each value. Similarly, ```dose``` variable takes values ```r names(b)``` respectively and exactly ```r b``` times for each value.<br>
+A more detailed summary for variable ```len``` is given by the function ```describe()``` of ```psych package```. The mean of the variable is ```r c$mean``` while its median is ```r c$median```, the near equality of these statistics show that the mass of observations with values higher and lower to the mean are equal. The variance of the variable is ```r c$vars``` while its maximum and minimum values are ```r c$max``` and ```r c$min``` respectively, for a range of ```r c$range```. The skewness of ```r c$skew``` even if slightly negative indicating a slightly longer lower tail basically assumes a symmetrical distribution. However with a kurtosis value of ```r c$kurtosis``` the distribution is clearly platykurtic, corresponding to thin tails, indicating that distribution is less clustered around the mean value compared to the normal distribution.<br>
+<h3>2. Summary of the Data</h3>
+In sections one above, one can see that the data is evenly spitted between groups within ```supp``` variable and within ```dose``` variables. But not only should the data be evenly spitted between groups looking at just one categorical variable but also the combination of the two.<br>
+```{r, cache = TRUE}
+table(data$supp, data$dose)
+```
+The table up shows how many observations we have for all combinations of values of the two categorical variables, each combinations has 20 observations. The data is hence perfectly balanced.<br>
+```{r, echo = FALSE, fig.align='center'}
+library(ggplot2)
+title <- "Teeth Length by Supplement Type & Dose Levels"
+subtitle <- "(ToothGrowth data)"
+plot1 <- ggplot(data, aes(x = len, y = dose, color = supp)) + geom_point(shape = 1)
+plot1 <- plot1 + xlab("Teeth Length") + ylab("Dose Levels")
+plot1 <- plot1 + ggtitle(bquote(atop(.(title), atop(italic(.(subtitle)), ""))))
+plot1 <- plot1 + theme(plot.title = element_text(size=19,lineheight=.8,vjust=-1))
+plot1 <- plot1 + scale_colour_discrete(name = "Supplement Type", labels=c("Orange Juice", "Ascorbic Acid"))
+plot1
+
+```
+First observe that the data doesn't seem to have outliers, data points being mostly grouped. As we can imagine higher dose of Vitamin C seem to stimulate teeth growth, but differences in teeth growth along supplement type line is more difficult to assess. In average it seems however that Orange Juice does better in low and medium levels, while ascorbic acid does better in higher levels.<br>
+```{r, echo = FALSE, fig.align='center'}
+library(ggplot2)
+suppressMessages(library(Hmisc))
+m <- ftable(data$supp, data$dose, cut2(data$len, g = 4), row.vars=1:2) # 3-way table of group means
+names(attr(m, "row.vars")) <- c("Supplement Type","Dose") # Add names for the row variables
+names(attr(m, "col.vars")) <- "Tooth Length" # ...and the column variable
+write.ftable(m, file = "", digits = 3, quote = FALSE) # Pretty-print the table to a file
+```
+One can also cut length in quartile groups and study a 3-ways contingency table to investigate further the above assumptions. The table up is such a table. Observe that no matter the dosage levels, it seems like supplement Orange Juice does systematically better.<br>
+Let's directly look at differences in mean of Tooth length between the different groups, along ```dose``` first, ```supp``` second and both categorical variables in the end.<br>
+```{r, cache = TRUE}
+tapply(data$len, list(data$dose), mean);tapply(data$len, list(data$supp), mean);tapply(data$len, list(data$supp, data$dose), mean)
+```
+Indeed it seems like in average of teeth length, higher doses seem to perform better than than lower doses, and Orange Juice seem to perform better than Ascorbic Acid when considering only one of the categorical variables. However, when considering the interaction between the two variables, Orange Juice perform much better in lower and medium doses, while at higher doses the difference in performance between the two types of delivery is very small.<br>
+<h3>3. T - test, Confidence Intervals and Hypothesis Tests</h3>
+Now one can test the differences in mean between the different groups using the t-test. Observe here that an ANOVA is much better suited as it can be more simply do the different comparisons. Let's do a two - by - two comparison with T -Test.<br>
+For variable supp this is not a problem as it has only two categories that we need to compare, for variable dose however one need to create 3 subset of the original data, each using only two categories of the three dose variable categories. Then 3 T-Tests is conducted, one for each combination of categories.<br>
+
+```{r, cache = TRUE}
+d <- t.test(len ~ supp, data = data)
+data1 <- subset(data, dose=="LOW"|dose=="MID"); data2 <- subset(data, dose=="LOW"|dose=="HIGH"); data3 <- subset(data, dose=="MID"|dose=="HIGH")
+e1 <- t.test(len ~ dose, data = data1); e2 <- t.test(len ~ dose, data = data2); e3 <- t.test(len ~ dose, data = data3)
 ```

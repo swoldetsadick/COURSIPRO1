@@ -1,0 +1,46 @@
+---
+title: "Statistical Inference - Course Project - Part II"
+author: "Woldetsadick Selam Getachew"
+date: "Thursday, October 23, 2014"
+output: html_document
+---
+```{r, echo = FALSE, results='hide', cache = TRUE}
+old.loc <- Sys.getlocale("LC_TIME")
+Sys.setlocale(category = "LC_TIME", locale="English")
+
+time <- format(Sys.time(),"%a, %b %d %Y, %X")
+
+rversion <- R.Version()
+rversion <- rversion[[13]]
+
+sysversion <- sessionInfo()
+sysversion <- sysversion[2]
+
+```
+
+<hr width="100%" style="border: 2px double #000000" color="#FFFFFF" size="6"></hr>
+<center><h1> Part I: Simulation Exercises</h1></center>
+The following analysis was made using the R statistic software version `r rversion` on a computer using Windows OS version `r sysversion` and completed on `r time`.<br>
+<hr  width="100%" color="#000000" size="4">
+<h3>1. Explanatory Data Analysis</h3>
+For the second part of the project, the ToothGrowth dataset in the R datasets package is used to make some basic inferential data analysis.<br>
+The dataset monitors the length of teeth (mm) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid).<br>
+```{r, echo = TRUE, cache = TRUE}
+#Loading data set
+library(datasets)
+data(ToothGrowth)
+data <- ToothGrowth
+# Some Observations on the Data
+name <- names(data)
+nas <- sum(is.na(data))
+Dim <- dim(data)
+data$dose <- ifelse(data$dose == .5, "LOW", ifelse(data$dose == 1, "MID", "HIGH"))
+for(i in 1:3){if(i!=1) {data[,i] <- as.factor(data[,i])} else {data[,i] <- as.numeric(data[,i])}}
+```
+First some basic observations of the dataset. After loading **ToothGrowth** dataset, it is renamed **data** for the sake of convenience. The names of the variables in the dataset are ```r name``` corresponding to the respectively to the length of teeth (in mm) in each guinea pig, the delivery methods (or supplement type) and the dose levels of vitamin C.<br>
+Observe that the number of missing values in the dataset is exactly equal to ```r nas``` and that dimensions of said dataset are ```r Dim```. It is to be remembered that three dose levels of Vitamin are coded by level in mg in the dataset. For this analysis however the preference is to make the ```dose```variable more descriptive by substituting levels .5, 1 and 2 by LOW, MID and HIGH respectively, corresponding to more descriptive levels of dose.<br>
+This process might change the dose variable a factor variable. However to make sure that it is indeed the case, class numeric was assigned to ```len``` variable while ```supp``` and the new ```dose``` variables are assigned class factor, meaning that the latter two variables are categorical variables.<br>
+```{r, echo = TRUE, cache = TRUE}
+#Short Summary of Data 
+summary(data)
+```

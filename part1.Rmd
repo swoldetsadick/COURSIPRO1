@@ -4,13 +4,23 @@ author: "Woldetsadick Selam Getachew"
 date: "Wednesday, October 22, 2014"
 output: html_document
 ---
-```{r, echo = FALSE, cache = TRUE}
-one <- paste(paste("rexp(n, ","lambda",sep=""), ")", sep = "")
-two <- expression(lambda)
+```{r, echo = FALSE, results='hide', cache = TRUE}
+old.loc <- Sys.getlocale("LC_TIME")
+Sys.setlocale(category = "LC_TIME", locale="English")
+
+time <- format(Sys.time(),"%a, %b %d %Y, %X")
+
+rversion <- R.Version()
+rversion <- rversion[[13]]
+
+sysversion <- sessionInfo()
+sysversion <- sysversion[2]
+
 ```
 
 <hr width="100%" style="border: 2px double #000000" color="#FFFFFF" size="6"></hr>
 <center><h1> Part I: Simulation Exercises</h1></center>
+The following analysis was made using the R statistic software version `r rversion` on a computer using Windows OS version `r sysversion` and completed on `r time`.<br>
 <hr  width="100%" color="#000000" size="4">
 <h3>Generating the Data</h3>
 The exponential distribution can be simulated in R with repx(n,&lambda;) where &lambda; represents the rate parameter of the exponential distribution. It can also be demonstrated that the mean of exponential distribution is &mu; = <sup>1</sup>&frasl;<sub>&lambda;</sub> and the standard deviation &theta; is also &theta; = <sup>1</sup>&frasl;<sub>&lambda;</sub>. In this simulation, &lambda; is set to equal 0.2, and n to 40. Hence are generated 1000 simulated averages of 40 exponential of parameter equal to .2.
@@ -66,8 +76,16 @@ theta <- round(((1/lambda)/sqrt(n)), digits = 2)
 Let's note *S* the standard error of the averages of the n simulated exponential of parameter &lambda;, and &theta; its true (theoretical) standard deviation. Their values for n = 40 are respectively *S* = ```r Ssqr``` and &theta; = ```r theta```. Observe the near equality of these two values. This near equality is guaranteed by the CLT.<br>
 The theoretical & the empiric variability of the averages of the n simulated exponential around the mean is close. One can then conclude that that the expected value of sample averages is an unbiased estimator of the mean of the exponential ditribution from which the sample are drawn from.
 
-<h3> Central Limit Theorem </h3>
-```{r, echo = FALSE}
+<h3>3. Central Limit Theorem </h3>
+```{r, echo = FALSE, fig.align='center'}
 qqnorm(Rmeans, col="red")
-qqline(row_means, col = "blue")
+qqline(Rmeans, col = "blue")
 ```
+It was observed in the first plot up that the distribution of sample averages follows closely a normal distribution. It was also observed that this closeness was guaranteed by the CLT as long as the draws are idependent and identical, the distribution that they are drawn from is finite and n is large enough. <br>
+As can be seen in the plot up, the QQplot is not perfectly linear. The higher and lower tail don't fall exactly on the 45° line but the very large majority of observations does so one can conclude that the distribution is indeed approximately normal.<br>
+
+<h3>4. Confidence Interval Coverage</h3>
+```{r, echo = TRUE, fig.align='center'}
+interval <- mean(Rmeans) + c(-1,1)*qnorm(.975)*(sd(Rmeans)/sqrt(n))
+```
+So if one assumes that the samples in this simulation are an IID draw of an exponential distribution of whose parameter &lambda; is unknown, one can conclude that 95% of the time, the true value of <sup>1</sup>&frasl;<sub>&lambda;</sub> will be in the interval [```r interval```]

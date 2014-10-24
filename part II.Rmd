@@ -83,9 +83,21 @@ Indeed it seems like in average of teeth length, higher doses seem to perform be
 <h3>3. T - test, Confidence Intervals and Hypothesis Tests</h3>
 Now one can test the differences in mean between the different groups using the t-test. Observe here that an ANOVA is much better suited as it can be more simply do the different comparisons. Let's do a two - by - two comparison with T -Test.<br>
 For variable supp this is not a problem as it has only two categories that we need to compare, for variable dose however one need to create 3 subset of the original data, each using only two categories of the three dose variable categories. Then 3 T-Tests is conducted, one for each combination of categories.<br>
-
 ```{r, cache = TRUE}
 d <- t.test(len ~ supp, data = data)
 data1 <- subset(data, dose=="LOW"|dose=="MID"); data2 <- subset(data, dose=="LOW"|dose=="HIGH"); data3 <- subset(data, dose=="MID"|dose=="HIGH")
-e1 <- t.test(len ~ dose, data = data1); e2 <- t.test(len ~ dose, data = data2); e3 <- t.test(len ~ dose, data = data3)
+e <- t.test(len ~ dose, data = data1); f <- t.test(len ~ dose, data = data2); g <- t.test(len ~ dose, data = data3)
 ```
+The null hypothesis of the t-test is that the mean between the two groups are equal, the alternative being that difference is not equal to 0. In the case of the group OJ mean against group VC mean in teeth length, the t-test gives a p-value of ```r d$p.value```, and hence one cannot reject the hypothesis that difference between the two means are equal to zero. And so difference in mean teeth length observed in data could be accidental.<br>
+For the difference between low dose group mean and medium dose group mean, the p-value for the t-test is &#8776; ```r  round(e$p.value, digits=4)```, between low dose group and high dose group the p-value for the t-test is &#8776; ```r  round(f$p.value, digits=4)``` and finally between medium dose group and high dose group the p-value for the t-test is &#8776; ```r  round(g$p.value, digits=4)```. Hence one can reject the null hypothesis that difference between the two means are equal to zero, meaning difference in mean teeth length observed in data could not be accidental, vitamin C dose levels have incidence on teeth length.<br>
+Following, t-tests to test the differences between the different groups created by the interaction of the two categorical variable can be done. The easiest way to test difference of means in groups created by interactions of these two variables is to simply cut the data along the dosage variable, then test difference of mean between groups formed by supplement type.This is what is done in the code chunk below.
+```{r, cache = TRUE}
+dosevals <- c("LOW","MID","HIGH")
+pvals <- sapply(dosevals, function(vals){
+         subd <- subset(data, dose == vals)
+         h <- t.test(len ~ supp, data = subd)
+         round(h$p.value, digits=4)})
+```        
+Within the low dosage group, the difference in means of teeth length between the groups using Ascorbic Acid and Orange Juice as supplement are found to be statistically significant as the p-value of the t -test equal to ```r pvals[[1]]``` can permit to reject the null hypothesis. Similarly, within the medium dosage group, the difference in means of teeth length between the groups using Ascorbic Acid and Orange Juice as supplement are found to be statistically significant as the p-value of the t -test is equal to ```r pvals[[2]]```.<br>
+On the contrary, within the high dosage group the t-test gives a p-value of ```r pvals[[3]]``` cannot permit to reject the null hypothesis, and hence difference in mean observed between the two groups within the high dosage group can be due to chance.<br>
+<h3>2. conclusions and Assumptions</h3>

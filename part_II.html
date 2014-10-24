@@ -123,7 +123,14 @@ Now one can test the differences in mean between the different groups using the 
 </ol>
 <pre class="r"><code>d &lt;- t.test(len ~ supp, data = data)
 data1 &lt;- subset(data, dose==&quot;LOW&quot;|dose==&quot;MID&quot;); data2 &lt;- subset(data, dose==&quot;LOW&quot;|dose==&quot;HIGH&quot;); data3 &lt;- subset(data, dose==&quot;MID&quot;|dose==&quot;HIGH&quot;)
-e1 &lt;- t.test(len ~ dose, data = data1); e2 &lt;- t.test(len ~ dose, data = data2); e3 &lt;- t.test(len ~ dose, data = data3)</code></pre>
+e &lt;- t.test(len ~ dose, data = data1); f &lt;- t.test(len ~ dose, data = data2); g &lt;- t.test(len ~ dose, data = data3)</code></pre>
+<p>The null hypothesis of the t-test is that the mean between the two groups are equal, the alternative being that difference is not equal to 0. In the case of the group OJ mean against group VC mean in teeth length, the t-test gives a p-value of <code>0.0606</code>, and hence one cannot reject the hypothesis that difference between the two means are equal to zero. And so difference in mean teeth length observed in data could be accidental.<br> For the difference between low dose group mean and medium dose group mean, the p-value for the t-test is ≈ <code>0</code>, between low dose group and high dose group the p-value for the t-test is ≈ <code>0</code> and finally between medium dose group and high dose group the p-value for the t-test is ≈ <code>0</code>. Hence one can reject the null hypothesis that difference between the two means are equal to zero, meaning difference in mean teeth length observed in data could not be accidental, vitamin C dose levels have incidence on teeth length.<br> Following, t-tests to test the differences between the different groups created by the interaction of the two categorical variable can be done. The easiest way to test difference of means in groups created by interactions of these two variables is to simply cut the data along the dosage variable, then test difference of mean between groups formed by supplement type.This is what is done in the code chunk below.</p>
+<pre class="r"><code>dosevals &lt;- c(&quot;LOW&quot;,&quot;MID&quot;,&quot;HIGH&quot;)
+pvals &lt;- sapply(dosevals, function(vals){
+         subd &lt;- subset(data, dose == vals)
+         h &lt;- t.test(len ~ supp, data = subd)
+         round(h$p.value, digits=4)})</code></pre>
+<p>Within the low dosage group, the difference in means of teeth length between the groups using Ascorbic Acid and Orange Juice as supplement are found to be statistically significant as the p-value of the t -test equal to <code>0.0064</code> can permit to reject the null hypothesis. Similarly, within the medium dosage group, the difference in means of teeth length between the groups using Ascorbic Acid and Orange Juice as supplement are found to be statistically significant as the p-value of the t -test is equal to <code>0.001</code>.<br> On the contrary, within the high dosage group the t-test gives a p-value of <code>0.9639</code> cannot permit to reject the null hypothesis, and hence difference in mean observed between the two groups within the high dosage group can be due to chance.<br></p>
 
 
 </div>

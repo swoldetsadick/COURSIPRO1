@@ -21,7 +21,6 @@ sysversion <- sysversion[2]
 <hr width="100%" style="border: 2px double #000000" color="#FFFFFF" size="6"></hr>
 <center><h1> Part I: Simulation Exercises</h1></center>
 The following analysis was made using the R statistic software version `r rversion` on a computer using Windows OS version `r sysversion` and completed on `r time`.<br>
-<hr  width="100%" color="#000000" size="4">
 <h3>1. Explanatory Data Analysis</h3>
 For the second part of the project, the ToothGrowth dataset in the R datasets package is used to make some basic inferential data analysis.<br>
 The dataset monitors the length of teeth (mm) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid).<br>
@@ -46,7 +45,7 @@ library(psych)
 a <- summary(data$supp); b <- summary(data$dose); c <- describe(data$len)
 ```
 Observe that ```supp``` variable takes values ```r names(a)``` respectively for Orange Juice and Ascorbic Acid and exactly ```r a``` times for each value. Similarly, ```dose``` variable takes values ```r names(b)``` respectively and exactly ```r b``` times for each value.<br>
-A more detailed summary for variable ```len``` is given by the function ```describe()``` of ```psych package```. The mean of the variable is ```r c$mean``` while its median is ```r c$median```, the near equality of these statistics show that the mass of observations with values higher and lower to the mean are equal. The variance of the variable is ```r c$vars``` while its maximum and minimum values are ```r c$max``` and ```r c$min``` respectively, for a range of ```r c$range```. The skewness of ```r c$skew``` even if slightly negative indicating a slightly longer lower tail basically assumes a symmetrical distribution. However with a kurtosis value of ```r c$kurtosis``` the distribution is clearly platykurtic, corresponding to thin tails, indicating that distribution is less clustered around the mean value compared to the normal distribution.<br>
+A more detailed summary for variable ```len``` is given by the function ```describe()``` of ```psych package```. The mean of the variable is ```r c$mean``` while its median is ```r c$median```, the near equality of these statistics show that the mass of observations with values higher and lower to the mean are equal. The variance of the variable is ```r c$vars``` while its maximum and minimum values are ```r c$max``` and ```r c$min``` respectively, for a range of ```r c$range```. The skewness of ```r c$skew``` even if slightly negative indicating a slightly longer lower tail basically assumes a symmetrical distribution. However with a kurtosis value of ```r c$kurtosis``` the distribution is clearly platykurtic, corresponding to thin tails, indicating that distribution is less clustered around the mean value compared to the normal distribution.
 <h3>2. Summary of the Data</h3>
 In sections one above, one can see that the data is evenly spitted between groups within ```supp``` variable and within ```dose``` variables. But not only should the data be evenly spitted between groups looking at just one categorical variable but also the combination of the two.<br>
 ```{r, cache = TRUE}
@@ -79,9 +78,10 @@ Let's directly look at differences in mean of Tooth length between the different
 ```{r, cache = TRUE}
 tapply(data$len, list(data$dose), mean);tapply(data$len, list(data$supp), mean);tapply(data$len, list(data$supp, data$dose), mean)
 ```
-Indeed it seems like in average of teeth length, higher doses seem to perform better than than lower doses, and Orange Juice seem to perform better than Ascorbic Acid when considering only one of the categorical variables. However, when considering the interaction between the two variables, Orange Juice perform much better in lower and medium doses, while at higher doses the difference in performance between the two types of delivery is very small.<br>
+Indeed it seems like in average of teeth length, higher doses seem to perform better than than lower doses, and Orange Juice seem to perform better than Ascorbic Acid when considering only one of the categorical variables. However, when considering the interaction between the two variables, Orange Juice perform much better in lower and medium doses, while at higher doses the difference in performance between the two types of delivery is very small.
 <h3>3. T - test, Confidence Intervals and Hypothesis Tests</h3>
-Now one can test the differences in mean between the different groups using the t-test. Observe here that an ANOVA is much better suited as it can be more simply do the different comparisons. Let's do a two - by - two comparison with T -Test.<br>
+All conclusion hereinafter are made at 95% confidence interval.
+Now one can test the differences in mean between the different groups using the t-test.<br>
 For variable supp this is not a problem as it has only two categories that we need to compare, for variable dose however one need to create 3 subset of the original data, each using only two categories of the three dose variable categories. Then 3 T-Tests is conducted, one for each combination of categories.<br>
 ```{r, cache = TRUE}
 d <- t.test(len ~ supp, data = data)
@@ -98,6 +98,23 @@ pvals <- sapply(dosevals, function(vals){
          h <- t.test(len ~ supp, data = subd)
          round(h$p.value, digits=4)})
 ```        
-Within the low dosage group, the difference in means of teeth length between the groups using Ascorbic Acid and Orange Juice as supplement are found to be statistically significant as the p-value of the t -test equal to ```r pvals[[1]]``` can permit to reject the null hypothesis. Similarly, within the medium dosage group, the difference in means of teeth length between the groups using Ascorbic Acid and Orange Juice as supplement are found to be statistically significant as the p-value of the t -test is equal to ```r pvals[[2]]```.<br>
-On the contrary, within the high dosage group the t-test gives a p-value of ```r pvals[[3]]``` cannot permit to reject the null hypothesis, and hence difference in mean observed between the two groups within the high dosage group can be due to chance.<br>
-<h3>2. conclusions and Assumptions</h3>
+Within the low dosage group, the difference in means of teeth length between the groups using Ascorbic Acid and Orange Juice as supplement are found to be statistically significant as the p-value of the t -test equal to ```r pvals[[1]]``` can permit to reject the null hypothesis. Similarly, within the medium dosage group, the difference in means of teeth length between the groups using Ascorbic Acid and Orange Juice as supplement are found to be statistically significant as the p-value of the t -test is equal to ```r pvals[[2]]```. On the contrary, within the high dosage group the t-test gives a p-value of ```r pvals[[3]]``` cannot permit to reject the null hypothesis, and hence difference in mean observed between the two groups within the high dosage group can be due to chance.<br>
+<h3>4. conclusions and Assumptions</h3>
+In **conclusion** one can say that the supplement type Orange Juice or Ascorbic Acid by itself has no effect on the growth of teeth. On the contrary the dosage levels have a statistically significant impact on teeth growth, in fact the higher the dosage, the higher the teeth growth.<br>
+On the other side, while within the high dosage group the supplement type has no significant impact on teeth growth, it seems like that for low and medium dosages, using Orange Juice as supplement has more effect than Ascorbic Acid.<br>
+However, some assumptions were made when applying t-test.
+1. Randomized assignment of the animals to the different sub-groups controlling effectively for effect of counfonders
+2. Equal variance across pairwise groups being compared (Homogeneity).
+3. Normality of the outcome variable distribution (specially Skewness)
+4. Outliers
+5. Sample representativeness
+<h3>5. Annexes</h3>
+While assumptions 1 & 5 can be estimated to be met because of a good study design. One can check for outliers in scatterplot above, and there are none. The ```len``` as seen above present no skewness and the QQplot below shows that it follows roughly a normal distribution.One can study homogeneity with Bartlett test.
+```{r, echo=FALSE, fig.align='center'}
+qqnorm(data$len, col="red")
+qqline(data$len, col = "blue")
+```
+```{r, echo=TRUE, cache=TRUE}
+i <- bartlett.test(len ~ interaction(supp, dose), data = data)
+```
+The null hypothesis of this test being that all K groups variances are equal against each other (Talking about groups along the two categorical variables here). The p value of the test is equal to ```r i$p.value``` which doesn't permit to reject equality of variance at 95% confidence interval.

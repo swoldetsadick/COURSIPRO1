@@ -20,6 +20,21 @@ names(attr(m, "col.vars")) = "Tooth Length" # ...and the column variable
 write.ftable(m, file="", digits=3, quote=FALSE) # Pretty-print the table to a file
 
 
+library(scatterplot3d)
+with(data, {scatterplot3d(len, dose, supp, main = "3-D Scatterplot Example 1")})
+
+library(ggplot2)
+ggplot(data, aes(x = len, y = supp, color = dose)) + geom_point(shape = 1)
+
+tapply(len, list(dose), mean)
+
+tapply(len, list(supp), mean)
+
 tapply(len, list(supp, dose), mean)
-library(nlme)
-isBalanced(data, countOnly = TRUE) 
+
+twoway = aov(len~supp * dose, data=data)
+summary(twoway)
+twoway = aov(len~supp + dose, data=data)
+summary(twoway)
+
+

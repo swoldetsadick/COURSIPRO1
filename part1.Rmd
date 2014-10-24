@@ -85,7 +85,29 @@ It was observed in the first plot up that the distribution of sample averages fo
 As can be seen in the plot up, the QQplot is not perfectly linear. The higher and lower tail don't fall exactly on the 45° line but the very large majority of observations does so one can conclude that the distribution is indeed approximately normal.<br>
 
 <h3>4. Confidence Interval Coverage</h3>
-```{r, echo = TRUE, fig.align='center'}
+```{r, echo = TRUE}
 interval <- mean(Rmeans) + c(-1,1)*qnorm(.975)*(sd(Rmeans)/sqrt(n))
+n <- 40
+nosim <- 1000
+lambda <- .2
+
+avgvals <- seq(4, 6, by = 0.01)
+coverage <- sapply(avgvals, function(avg){
+         set.seed(123)
+         datas <- matrix(rexp(n * nosim, rate = lambda), nosim, n)
+         xbars <- apply(datas, 1, mean)
+         ll <- xbars - qnorm(.975) * sqrt(1/lambda**2/n)
+         ul <- xbars + qnorm(.975) * sqrt(1/lambda**2/n)
+         mean(ll < avg & ul > avg)
+})
+```
+```{r, echo = FALSE, fig.align='center'}
+library(ggplot2)
+covgraph <- qplot(avgvals, coverage) + geom_hline(yintercept = 0.95, col = "red")
+covgraph <- covgraph + geom_vline(xintercept = 4.77, col = "blue")
+covgraph <- covgraph + geom_vline(xintercept = 5.25, col = "blue")
+covgraph <- covgraph + xlab("Mean") +ggtitle("Mean Coverage for Exponential of Parameter .2")
+covgraph
 ```
 So if one assumes that the samples in this simulation are an IID draw of an exponential distribution of whose parameter &lambda; is unknown, one can conclude that 95% of the time, the true value of <sup>1</sup>&frasl;<sub>&lambda;</sub> will be in the interval [```r interval```]
+Observe how the theoretical mean <sup>1</sup>&frasl;<sub>&lambda;</sub> &#61; 5 is covered by the 95% confidence interval.
